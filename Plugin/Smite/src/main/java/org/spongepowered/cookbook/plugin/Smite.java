@@ -63,7 +63,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 
-@Plugin(id = "casaponsmite",
+@Plugin(id = "ca_sapon_smite",
         name = "Smite",
         version = "1.0",
         description = "Use me on your enemies")
@@ -134,8 +134,8 @@ public class Smite {
         // Get the first block hit
         final BlockRay.BlockRayBuilder<World> blockRay = BlockRay.from(player);
         final Optional<BlockRayHit<World>> optionalBlockHit = blockRay
-                .filter(BlockRay.maxDistanceFilter(blockRay.position(), MAX_DISTANCE))
-                .filter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1))
+                .distanceLimit(MAX_DISTANCE)
+                .stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1))
                 .end();
         // Get the first entity hit
         final Optional<EntityUniverse.EntityHit> optionalEntityHit = player.getWorld()
@@ -162,9 +162,10 @@ public class Smite {
             }
         }
         // Smite!
-        final Optional<Entity> optionalEntity = Optional.of(player.getWorld().createEntity(EntityTypes.LIGHTNING, closest));
-        optionalEntity.ifPresent(entity -> player.getWorld().spawnEntity(entity,
-                Cause.source(EntitySpawnCause.builder().entity(entity).type(SpawnTypes.PLUGIN).build()).build().merge(event.getCause())));
+
+        final Entity entity = player.getWorld().createEntity(EntityTypes.LIGHTNING, closest);
+        player.getWorld().spawnEntity(entity,
+                Cause.source(EntitySpawnCause.builder().entity(entity).type(SpawnTypes.PLUGIN).build()).build().merge(event.getCause()));
     }
 
 }
